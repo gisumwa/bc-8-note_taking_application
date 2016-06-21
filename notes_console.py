@@ -2,7 +2,7 @@
 ThoughtBook
 
 Usage:
-    note create <entry>
+    note create <note>
     note search <args>
     note open <id>
     note list_all
@@ -17,7 +17,7 @@ Options:
 import sys
 import cmd
 from docopt import docopt,DocoptExit
-from database import MyDatabase
+#from database import MyDatabase
 from functionalitites import NoteFunctionalities
 def docopt_cmd(func):
     """
@@ -81,13 +81,13 @@ class MyNotes(cmd.Cmd):
         """
         Usage: list_all
         """
-        return self.obj.list_notes()
+        return self.note_obj.list_notes()
 
     def do_delete_note(self, note_id):
         """
         Usage: delete_note <id>
         """
-        return self.obj.delete_note(note_id)
+        return self.note_obj.delete_note(note_id)
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""

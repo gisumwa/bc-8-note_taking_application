@@ -19,9 +19,10 @@ class NoteFunctionalities(object):
         NoteObject = MyDatabase()
         NoteObject.view_note(note_id)
 
-    def delete_note(self, note_id):
+    def delete_note(self, arg):
         NoteObject = MyDatabase()
-        NoteObject.delete_note(note_id)
+        NoteObject.delete_note(arg)
+        print("Deletion Successfull")
 
     def list_notes(self):
         NoteObject = MyDatabase()
@@ -35,11 +36,11 @@ class NoteFunctionalities(object):
         return "To be implemented"
 
 
-"""
+
 NA = NoteFunctionalities()
 #NA.create_note("Sample","Sample for person 1")
 print(NA.list_notes())
-
+"""
 NA2 = NoteFunctionalities()
 NA2.create_note("Sample2","Sample Note 1 for person 2")
 NA.create_note("Sample3","Sample Note 2 for person 1")

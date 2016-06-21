@@ -89,6 +89,7 @@ class MyDatabase(object):
 
 # Testing whether the commit database is create_note and list_notes functions are working
 db = MyDatabase()
+print(db.list_notes())
 # print(db.list_notes())
 # print(db.view_note(5))
 # db.enter_note("This title","Sample content")
