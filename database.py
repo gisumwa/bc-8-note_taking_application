@@ -29,6 +29,8 @@ class MyDatabase(object):
             self.connection.commit()
         else:
             print("Could not connect to the database")
+        self.search_offset = 0
+        self.list_offset = 0
 
     def createnote(self, note_title,
                    note_content):
@@ -48,25 +50,30 @@ class MyDatabase(object):
         :param offset:
         :param search_string:
         """
-        if isinstance(limit, int) and limit > 0:
-            with self.connection:
-                print("SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
-                      " LIMIT '{1}' OFFSET '{2}'".format(
-                    search_string, limit, offset))
-                search_list = self.cursor.execute(
-                    "SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
-                    " LIMIT '{1}' OFFSET '{2}'".format(
+        #limit = int(limit)
+        if limit != '':
+            print("The limit", limit)
+            if isinstance(int(limit), int) and limit > 0:
+                with self.connection:
+                    print("SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
+                          " LIMIT '{1}' OFFSET '{2}'".format(
                         search_string, limit, offset))
-            formatted_output = ''
-            for note in search_list:
-                formatted_output = note_display_format(formatted_output, note)
-            if len(formatted_output) > 0:
-                print(formatted_output)
-            else:
-                print("OOPS, you are out of records!")
+                    search_list = self.cursor.execute(
+                        "SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
+                        " LIMIT '{1}' OFFSET '{2}'".format(
+                            search_string, limit, offset))
+                formatted_output = ''
+                for note in search_list:
+                    formatted_output = note_display_format(formatted_output, note)
+                if len(formatted_output) > 0:
+                    print(formatted_output)
+                else:
+                    print("OOPS, you are out of records!")
 
         else:
             print("Executed other")
+            print("SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
+                search_string))
             with self.connection:
                 search_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
@@ -90,11 +97,14 @@ class MyDatabase(object):
             print("The note you are trying to access is not available")
 
     def listnotes(self, limit, offset):
+        print(limit)
         if isinstance(limit, int) and limit > 0:
+            print("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
             with self.connection:
                 notes_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
         else:
+            print("Next executes this for list")
             with self.connection:
                 notes_list = self.cursor.execute("SELECT * FROM NotesEntries")
         formatted_output = ''
@@ -107,40 +117,40 @@ class MyDatabase(object):
         else:
             print(formatted_output)
 
-    def limited_list(self, limit, offset):
-        with self.connection:
-            notes_list = self.cursor.execute("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
-            formatted_output = ''
-            for note in notes_list:
-                formatted_output = note_display_format(formatted_output, note)
-        print(formatted_output)
+    # def limited_list(self, limit, offset):
+    #     with self.connection:
+    #         notes_list = self.cursor.execute("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
+    #         formatted_output = ''
+    #         for note in notes_list:
+    #             formatted_output = note_display_format(formatted_output, note)
+    #     print(formatted_output)
 
-    def limited_search_list(self, search_text, limit, offset):
-        with self.connection:
-            notes_list = self.cursor.execute(
-                "SELECT * FROM NotesEntries WHERE LIKE %{}% LIMIT '{}' OFFSET '{}'".format(search_text, limit, offset))
-            formatted_output = ''
-            for note in notes_list:
-                formatted_output = note_display_format(formatted_output, note)
-        print(formatted_output)
+    # def limited_search_list(self, search_text, limit, offset):
+    #     with self.connection:
+    #         notes_list = self.cursor.execute(
+    #             "SELECT * FROM NotesEntries WHERE LIKE %{}% LIMIT '{}' OFFSET '{}'".format(search_text, limit, offset))
+    #         formatted_output = ''
+    #         for note in notes_list:
+    #             formatted_output = note_display_format(formatted_output, note)
+    #     print(formatted_output)
 
-    def next_limited_list(self, start_point, offset):
-        with self.connection:
-            notes_list = self.cursor.execute(
-                "SELECT * FROM NotesEntries WHERE id > {} OFFSET '{}'".format(start_point, offset))
-            formatted_output = ''
-            for note in notes_list:
-                formatted_output = note_display_format(formatted_output, note)
-        print(formatted_output)
-
-    def next_limited_search_list(self, search_text, start_point, offset):
-        with self.connection:
-            notes_list = self.cursor.execute(
-                "SELECT * FROM NotesEntries WHERE note_content OR note_title LIKE %{}% LIMIT '{}' OFFSET '{}'".format(
-                    search_text, start_point, offset))
-            formatted_output = ''
-            for note in notes_list:
-                formatted_output = note_display_format(formatted_output, note)
+    # def next_limited_list(self, start_point, offset):
+    #     with self.connection:
+    #         notes_list = self.cursor.execute(
+    #             "SELECT * FROM NotesEntries WHERE id > {} OFFSET '{}'".format(start_point, offset))
+    #         formatted_output = ''
+    #         for note in notes_list:
+    #             formatted_output = note_display_format(formatted_output, note)
+    #     print(formatted_output)
+    #
+    # def next_limited_search_list(self, search_text, start_point, offset):
+    #     with self.connection:
+    #         notes_list = self.cursor.execute(
+    #             "SELECT * FROM NotesEntries WHERE note_content OR note_title LIKE %{}% LIMIT '{}' OFFSET '{}'".format(
+    #                 search_text, start_point, offset))
+    #         formatted_output = ''
+    #         for note in notes_list:
+    #             formatted_output = note_display_format(formatted_output, note)
 
     def list_n_notes(self, arg):
         with self.connection:

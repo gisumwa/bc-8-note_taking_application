@@ -60,9 +60,12 @@ class MyNotes(cmd.Cmd):
     def __init__(self):
         self.note_obj = NoteFunctionalities()
         cmd.Cmd.__init__(self)
-        self.what_function = []
-        self.limit = 0
-        self.offset = 0
+        self.what_function = ['temp']
+        self.search_limit = 5
+        self.list_limit = 0
+        self.search_offset = 0
+        self.list_offset = 0
+        self.search_string = ''
 
     def intro(self):
         print('\t ')
@@ -103,36 +106,52 @@ class MyNotes(cmd.Cmd):
         """
         Usage: listnotes [--limit]
         """
-        self.limit = int(limit)
+        self.what_function.append('list')
         if limit == '':
             return self.note_obj.listnotes(limit, offset='')
+        elif not isinstance(int(limit), int):
+            print("The limit must be an integer value")
         else:
-            if isinstance(self.limit, int):
-                self.offset += self.limit
-                self.what_function.append('list')
-                return self.note_obj.listnotes(self.limit, self.offset)
+            if self.what_function[-1] == 'next':
+                self.list_limit = int(limit)
+                self.list_offset += self.list_limit
+                return self.note_obj.listnotes(self.list_limit, self.list_offset)
             else:
-                print("The limit must be an integer value")
+                self.list_limit = int(limit)
+                self.list_offset += self.list_limit
+                return self.note_obj.listnotes(int(limit), 0)
 
     def do_searchnotes(self, search_arg):
-        parameters = search_arg.split(' ')
-        print(parameters)
-        print(len(parameters))
         """
         Usage: searchnotes <query_string> [--limit]
         """
-        if len(parameters) < 2:
-            search_arg = parameters[0]
-            return self.note_obj.searchnotes(search_arg, limit='', offset='')
+        self.search_string = search_arg
+        parameters = search_arg.split(' ')
+        print(parameters)
+        print(len(parameters))
+        if len(parameters) > 2:
+            print("Enter only two parameters")
         else:
-            search_arg = parameters[0]
-            limit = int(parameters[1])
-            print(type(limit))
-            if isinstance(limit, int):
-                self.limit = limit
-                self.offset += limit
-                self.what_function.append('search')
-                return self.note_obj.searchnotes(search_arg, self.limit, self.offset)
+            self.search_string = parameters[0]
+            self.what_function.append('search')
+            if len(parameters) < 2:
+                search_arg = parameters[0]
+                return self.note_obj.searchnotes(search_arg, limit='', offset='')
+            else:
+                self.search_string = parameters[0]
+                print(parameters[0])
+                limit = parameters[1]
+                print(limit)
+                if isinstance(int(limit), str):
+                    print("Your limit must be an integer")
+                elif isinstance(int(limit), int) and self.what_function[-1] == 'next':
+                    self.search_limit = limit
+                    self.search_offset += limit
+                    return self.note_obj.searchnotes(self.search_string, self.search_limit, self.search_offset)
+                else:
+                    self.search_limit = int(limit)
+                    self.search_offset += self.search_limit
+                    return self.note_obj.searchnotes(self.search_string, self.search_limit, 0)
 
     def do_viewnote(self, note_id):
         """
@@ -146,28 +165,37 @@ class MyNotes(cmd.Cmd):
         Usage: next
         """
         self.what_function.append('next')
-        if len(self.what_function) > 1:
+        if len(self.what_function) > 2:
+            print(self.what_function)
             if self.what_function[-2] == 'search':
-                """Next will return the next specified number of files for the
-                searchnotes method
-                """
-                return self.note_obj.searchnotes(search_string, self.limit, self.offset)
+                print(self.what_function[-2])
+                # """Next will return the next specified number of files for the
+                # searchnotes method
+                # """
+                return self.note_obj.searchnotes(self.search_string, self.search_limit, self.search_offset)
                 # print("Next for the search functionality")
             elif self.what_function[-2] == 'list':
-                """Next will return the next specified number of files for the
-                    searchnotes method
-                    """
-                return self.note_obj.listnotes(self.limit, self.offset)
-                # print("Next for list functionality")
+                print(self.what_function[-2])
+                # """Next will return the next specified number of files for the
+                #     searchnotes method
+                #     """
+                return self.note_obj.listnotes(self.list_limit, self.list_offset)
+                # return self.note_obj.listnotes(int(self.list_limit), self.list_offset)
+                #print("Next for list functionality")
             elif self.what_function[-1] == 'next':
+                print("We in the next repetition")
                 function_list = [x for x in reversed(self.what_function)]
                 for function in function_list:
                     if function == 'search':
-                        return self.note_obj.searchnotes(search_string, self.limit, self.offset)
-                    else:
-                        return self.note_obj.listnotes(self.limit, self.offset)
+                        self.search_offset += self.search_limit
+                        return self.note_obj.searchnotes(self.search_string, int(self.search_limit), self.search_offset)
+                    elif function == 'list':
+                        self.list_offset += self.list_limit
+                        return self.note_obj.listnotes(int(self.list_limit), self.list_offset)
+
             else:
-                print("Next only preceeds listnotes or search notes")
+                print(self.what_function[-2])
+                print("Next only preceeds listnotes or searchnotes commands")
 
         else:
             print("Next cannot be the first command")
