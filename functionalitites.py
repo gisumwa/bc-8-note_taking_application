@@ -17,12 +17,15 @@ class NoteFunctionalities(object):
         print("Note Successfully Created")
 
     def viewnote(self, note_id):
-        print("Here")
         noteobject = MyDatabase()
         noteobject.viewnote(note_id)
 
     def deletenote(self, note_id):
+        if isinstance(note_id,dict):
         note_id = note_id['<note_id>']
+        note_id=int(note_id)
+        else:
+            note_id=int(note_id)
         noteobject = MyDatabase()
         noteobject.deletenote(note_id)
 
@@ -40,28 +43,7 @@ class NoteFunctionalities(object):
             offset = int(offset)
             noteobject.searchnotes(search_string, limit, offset)
 
-    def next(self, current_query):
-        print("To be implemented")
-
     def syncnotes(self):
-        self.NoteObject.syncnotes()
+        noteobject = MyDatabase()
+        noteobject.syncnotes()
 
-
-# NA = NoteFunctionalities()
-# NA.create_note("Sample","Sample for person 1")
-# NA.list_all('')
-# print(type(NA.list_all('')))
-# print((NA.search_notes("WORK")))
-# NA.search_notes("work")
-"""
-NA2 = NoteFunctionalities()
-NA2.create_note("Sample2","Sample Note 1 for person 2")
-NA.create_note("Sample3","Sample Note 2 for person 1")
-"""
-# print("Notes before delete", NA.list_notes())
-# print(NA.view_note(2))
-# NA.delete_note(1)
-# print("Notes after delete", NA.list_notes())
-# print(NA.notes_list.count("Sample Note 3"))
-# print(NA.view_note(""))
-# print(NA.view_note(5))
