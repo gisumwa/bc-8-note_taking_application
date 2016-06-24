@@ -71,9 +71,6 @@ class MyDatabase(object):
                     print("OOPS, you are out of records!")
 
         else:
-            print("Executed other")
-            print("SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
-                search_string))
             with self.connection:
                 search_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
@@ -99,12 +96,10 @@ class MyDatabase(object):
     def listnotes(self, limit, offset):
         print(limit)
         if isinstance(limit, int) and limit > 0:
-            print("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
             with self.connection:
                 notes_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
         else:
-            print("Next executes this for list")
             with self.connection:
                 notes_list = self.cursor.execute("SELECT * FROM NotesEntries")
         formatted_output = ''
@@ -116,41 +111,6 @@ class MyDatabase(object):
             print("Your Notes list is empty")
         else:
             print(formatted_output)
-
-    # def limited_list(self, limit, offset):
-    #     with self.connection:
-    #         notes_list = self.cursor.execute("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
-    #         formatted_output = ''
-    #         for note in notes_list:
-    #             formatted_output = note_display_format(formatted_output, note)
-    #     print(formatted_output)
-
-    # def limited_search_list(self, search_text, limit, offset):
-    #     with self.connection:
-    #         notes_list = self.cursor.execute(
-    #             "SELECT * FROM NotesEntries WHERE LIKE %{}% LIMIT '{}' OFFSET '{}'".format(search_text, limit, offset))
-    #         formatted_output = ''
-    #         for note in notes_list:
-    #             formatted_output = note_display_format(formatted_output, note)
-    #     print(formatted_output)
-
-    # def next_limited_list(self, start_point, offset):
-    #     with self.connection:
-    #         notes_list = self.cursor.execute(
-    #             "SELECT * FROM NotesEntries WHERE id > {} OFFSET '{}'".format(start_point, offset))
-    #         formatted_output = ''
-    #         for note in notes_list:
-    #             formatted_output = note_display_format(formatted_output, note)
-    #     print(formatted_output)
-    #
-    # def next_limited_search_list(self, search_text, start_point, offset):
-    #     with self.connection:
-    #         notes_list = self.cursor.execute(
-    #             "SELECT * FROM NotesEntries WHERE note_content OR note_title LIKE %{}% LIMIT '{}' OFFSET '{}'".format(
-    #                 search_text, start_point, offset))
-    #         formatted_output = ''
-    #         for note in notes_list:
-    #             formatted_output = note_display_format(formatted_output, note)
 
     def list_n_notes(self, arg):
         with self.connection:
@@ -203,20 +163,3 @@ class MyDatabase(object):
         file_name = 'noteconsoleapp.json'
         with open(file_name, 'w') as file:
             file.write(j)
-
-
-# Testing whether the commit database is create_note and list_notes functions are working
-db = MyDatabase()
-# print(db.search_notes("WORK"))
-# print(db.list_notes())
-# print(db.list_notes())
-# print(db.view_note(5))
-# db.enter_note("This title","Sample content")
-# db.enter_note("This title","Sample content")
-# print('initial list\n ',db.list_notes())
-# print("Results for searched note\n",db.view_note(1))
-# db.delete_note(9)
-# db.delete_note(2)
-# db.searchnotes("Hope", 2,0)
-# print(db.list_all('arg'))
-# print(next(db.list_notes))
