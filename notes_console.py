@@ -58,7 +58,7 @@ def docopt_cmd(func):
 
 class MyNotes(cmd.Cmd):
     def __init__(self):
-        self.note_obj = NoteFunctionalities()
+        self.my_note = NoteFunctionalities()
         cmd.Cmd.__init__(self)
         self.what_function = ['temp']
         self.search_limit = 5
@@ -80,27 +80,19 @@ class MyNotes(cmd.Cmd):
     intro = intro('Welcome')
     prompt = 'NoteBook>> '
     file = None
-
-    # def do_createnote(self, note_content):
-    #     """
-    #     Usage: createnote <note_content>
-    #     """
-    #     return self.note_obj.createnote(note_content)
-
-    @docopt_cmd
     def do_deletenote(self, note_id):
         """
         Usage: deletenote <note_id>
         """
         self.what_function.append("deletenote")
-        return self.note_obj.deletenote(note_id)
+        return self.my_note.deletenote(note_id)
 
     def do_create_note(self, note_content):
         """
             Usage: create_note <note_content>
             """
         self.what_function.append("createnote")
-        return self.note_obj.createnote(note_content)
+        return self.my_note.createnote(note_content)
 
     def do_listnotes(self, limit):
         """
@@ -108,18 +100,18 @@ class MyNotes(cmd.Cmd):
         """
         self.what_function.append('list')
         if limit == '':
-            return self.note_obj.listnotes(limit, offset='')
+            return self.my_note.listnotes(limit, offset='')
         elif not isinstance(int(limit), int):
             print("The limit must be an integer value")
         else:
             if self.what_function[-1] == 'next':
                 self.list_limit = int(limit)
                 self.list_offset += self.list_limit
-                return self.note_obj.listnotes(self.list_limit, self.list_offset)
+                return self.my_note.listnotes(self.list_limit, self.list_offset)
             else:
                 self.list_limit = int(limit)
                 self.list_offset += self.list_limit
-                return self.note_obj.listnotes(int(limit), 0)
+                return self.my_note.listnotes(int(limit), 0)
 
     def do_searchnotes(self, search_arg):
         """
@@ -127,8 +119,6 @@ class MyNotes(cmd.Cmd):
         """
         self.search_string = search_arg
         parameters = search_arg.split(' ')
-        print(parameters)
-        print(len(parameters))
         if len(parameters) > 2:
             print("Enter only two parameters")
         else:
@@ -136,10 +126,9 @@ class MyNotes(cmd.Cmd):
             self.what_function.append('search')
             if len(parameters) < 2:
                 search_arg = parameters[0]
-                return self.note_obj.searchnotes(search_arg, limit='', offset='')
+                return self.my_note.searchnotes(search_arg, limit='', offset='')
             else:
                 self.search_string = parameters[0]
-                print(parameters[0])
                 limit = parameters[1]
                 print(limit)
                 if isinstance(int(limit), str):
@@ -147,18 +136,18 @@ class MyNotes(cmd.Cmd):
                 elif isinstance(int(limit), int) and self.what_function[-1] == 'next':
                     self.search_limit = limit
                     self.search_offset += limit
-                    return self.note_obj.searchnotes(self.search_string, self.search_limit, self.search_offset)
+                    return self.my_note.searchnotes(self.search_string, self.search_limit, self.search_offset)
                 else:
                     self.search_limit = int(limit)
                     self.search_offset += self.search_limit
-                    return self.note_obj.searchnotes(self.search_string, self.search_limit, 0)
+                    return self.my_note.searchnotes(self.search_string, self.search_limit, 0)
 
     def do_viewnote(self, note_id):
         """
         Usage: viewnote <note_id>
         """
         self.what_function.append("viewnote")
-        return self.note_obj.viewnote(note_id)
+        return self.my_note.viewnote(note_id)
 
     def do_next(self, search_string):
         """
@@ -166,32 +155,27 @@ class MyNotes(cmd.Cmd):
         """
         self.what_function.append('next')
         if len(self.what_function) > 2:
-            print(self.what_function)
             if self.what_function[-2] == 'search':
                 print(self.what_function[-2])
-                # """Next will return the next specified number of files for the
+                # Next will return the next specified number of files for the
                 # searchnotes method
-                # """
-                return self.note_obj.searchnotes(self.search_string, self.search_limit, self.search_offset)
-                # print("Next for the search functionality")
+                # 
+                return self.my_note.searchnotes(self.search_string, self.search_limit, self.search_offset)
             elif self.what_function[-2] == 'list':
                 print(self.what_function[-2])
-                # """Next will return the next specified number of files for the
+                # Next will return the next specified number of files for the
                 #     searchnotes method
-                #     """
-                return self.note_obj.listnotes(self.list_limit, self.list_offset)
-                # return self.note_obj.listnotes(int(self.list_limit), self.list_offset)
-                #print("Next for list functionality")
+                #    
+                return self.my_note.listnotes(self.list_limit, self.list_offset)
             elif self.what_function[-1] == 'next':
-                print("We in the next repetition")
                 function_list = [x for x in reversed(self.what_function)]
                 for function in function_list:
                     if function == 'search':
                         self.search_offset += self.search_limit
-                        return self.note_obj.searchnotes(self.search_string, int(self.search_limit), self.search_offset)
+                        return self.my_note.searchnotes(self.search_string, int(self.search_limit), self.search_offset)
                     elif function == 'list':
                         self.list_offset += self.list_limit
-                        return self.note_obj.listnotes(int(self.list_limit), self.list_offset)
+                        return self.my_note.listnotes(int(self.list_limit), self.list_offset)
 
             else:
                 print(self.what_function[-2])
