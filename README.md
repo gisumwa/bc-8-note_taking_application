@@ -39,9 +39,9 @@ To install globally with pip type the command $ pip install virtualenv
 Install required modules
 
 Open the requirements.txt file and pip install the required modules using pip install -r requirements.txt
-Run ThoughtBook app
+Run NoteBook app
 
-On your console type in python my_journal.py -i to run the app interactively
+On your console terminal, type in python notes_console.py -i to run the app interactively
 App Functions
 
 The app enables a user to do certain processes by using the following commands
@@ -51,6 +51,7 @@ searchnote <search_string> [--limit] (search for an entry based on date or text)
 viewnote <note_id> (opens a specific journal entry based on ID)
 listnotes [--limit](opens all journal entries in the database)
 delete <note_id> (delete a journal based on the text)
+
 Dependencies
 
 To run the app you need to install all the modules used in the code. Install the modules by installing the requirements.py
