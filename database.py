@@ -8,7 +8,7 @@ from datetime import datetime
 global method that is going to be visible throughout the program
     """
 
-firebase.FirebaseApplication("https://noteconsoleapp.firebaseio.com/", None)
+fbase = firebase.FirebaseApplication("https://noteconsoleapp.firebaseio.com/", None)
 
 
 def note_display_format(formatted_output, note):
@@ -50,14 +50,14 @@ class MyDatabase(object):
         :param offset:
         :param search_string:
         """
-        #limit = int(limit)
+        # limit = int(limit)
         if limit != '':
             print("The limit", limit)
             if isinstance(int(limit), int) and limit > 0:
                 with self.connection:
-                    print("SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
-                          " LIMIT '{1}' OFFSET '{2}'".format(
-                        search_string, limit, offset))
+                    # print("SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
+                    #       " LIMIT '{1}' OFFSET '{2}'".format(
+                    #     search_string, limit, offset))
                     search_list = self.cursor.execute(
                         "SELECT * FROM NotesEntries WHERE note_content LIKE '%{0}%' or note_title LIKE '%{0}%'"
                         " LIMIT '{1}' OFFSET '{2}'".format(
@@ -65,12 +65,15 @@ class MyDatabase(object):
                 formatted_output = ''
                 for note in search_list:
                     formatted_output = note_display_format(formatted_output, note)
-                if len(formatted_output) > 0:
+                if len(formatted_output)== 0:
                     print(formatted_output)
                 else:
                     print("OOPS, you are out of records!")
 
         else:
+            print("Executed other")
+            print("SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
+                search_string))
             with self.connection:
                 search_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries WHERE note_title LIKE '%{0}%' or note_content LIKE '%{0}%'".format(
@@ -89,17 +92,21 @@ class MyDatabase(object):
             formatted_output = ''
             for note in note:
                 formatted_output = note_display_format(formatted_output, note)
-            print(formatted_output)
+                if(len(formatted_output) == 0 ):
+                    print("File not found")
+                else:
+                    print(formatted_output)
         except IndexError:
             print("The note you are trying to access is not available")
 
     def listnotes(self, limit, offset):
-        print(limit)
         if isinstance(limit, int) and limit > 0:
+            # print("SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
             with self.connection:
                 notes_list = self.cursor.execute(
                     "SELECT * FROM NotesEntries LIMIT '{}' OFFSET '{}'".format(limit, offset))
         else:
+            # print("Next executes this for list")
             with self.connection:
                 notes_list = self.cursor.execute("SELECT * FROM NotesEntries")
         formatted_output = ''
@@ -123,17 +130,13 @@ class MyDatabase(object):
         print(formatted_output)
 
     def deletenote(self, note_id):
-        print(note_id)
+        # print(note_id)
         q = "DELETE FROM NotesEntries WHERE id = {}".format(note_id)
-        print(type(self.cursor.execute(q)))
+        # print(type(self.cursor.execute(q)))
         self.cursor.execute(q)
         self.connection.commit()
         print("Deletion Successful")
-
-    def next(self, current_function):
-        print("noy yet implemented")
-
-    def syncnotes(self):
+    def syncnotes(self, arg):
         note_rows = self.cursor.execute("SELECT * FROM NotesEntries")
         notes_list = []
         for note in note_rows:
@@ -143,13 +146,11 @@ class MyDatabase(object):
             d['title'] = note[2]
             d['note'] = note[3]
             notes_list.append(d)
-        firebase.put('/noteconsoleapp', 'note', notes_list)
 
-    def export_to_json_file(self):
-        """
-        Gets current data on DB and saves in a JSON file with JSON format
-        """
+        if fbase.put('/noteconsoleapp', 'note', notes_list):
+            print("Sync Successful, look at your firebase url to confirm the changes")
 
+    def create_json_file(self, arg):
         note_rows = self.cursor.execute("SELECT * FROM NotesEntries")
         notes_list = []
         for note in note_rows:
@@ -159,7 +160,6 @@ class MyDatabase(object):
             d['title'] = note[2]
             d['note'] = note[3]
             notes_list.append(d)
-        j = json.dumps(notes_list)
-        file_name = 'noteconsoleapp.json'
-        with open(file_name, 'w') as file:
-            file.write(j)
+        with open('noteconsoleapp.json', 'w') as file:
+            if file.write(json.dumps(notes_list)):
+                print("file successfully saved, open noteconsoleapp.json to view the notes")
